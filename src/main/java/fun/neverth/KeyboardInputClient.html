@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>keyBoardMapping</h1>
+    <p>当焦点在此页面时，键盘输入会被映射到远程</p>
+    <form onsubmit="return false;">
+        <br>
+        <h3>响应</h3>
+        <textarea id="responseText" style="width: 500px;height: 300px;"></textarea>
+    </form>
+
+</body>
+<script>
+    var websocket;
+    if (!window.WebSocket) {
+        window.WebSocket = window.MozWebSocket;
+    }
+    if (window.WebSocket) {
+        // websocket = new WebSocket("ws://127.0.0.1:8898/web");
+        websocket = new WebSocket("ws://106.14.44.108:8898/web");
+        websocket.onmessage = function (event) {
+            console.log("websocket接受消息" + event.data);
+            var text = document.getElementById('responseText');
+            text.value = text.value + event.data + '\n';
+        }
+        websocket.onopen = function (event) {
+            console.log("websocket打开");
+            var text = document.getElementById('responseText');
+            text.value = text.value + "连接服务器成功\n";
+        }
+        websocket.onclose = function (event) {
+            console.log("websocket关闭");
+            var text = document.getElementById('responseText');
+            text.value = text.value + "关闭websocket服务\n";
+        }
+        websocket.onerror = function (event) {
+            console.log("websocket异常");
+            var text = document.getElementById('responseText');
+            text.value = text.value + "websocket服务异常\n";
+        }
+    } else {
+        alert("你的浏览器不支持WebSocket");
+    }
+
+    function send(message) {
+        if (websocket) {
+            if (websocket.readyState === WebSocket.OPEN) {
+                websocket.send(message);
+            }
+        } else {
+            alert("未建立websocket连接");
+        }
+    }
+
+    document.onkeydown = function (event) {
+        console.log("d" + event.keyCode);
+        send("d" + event.keyCode)
+    }
+    
+    document.onkeyup = function (event) {
+        console.log("u" + event.keyCode);
+        send("u" + event.keyCode)
+    }
+</script>
+
+</html>
